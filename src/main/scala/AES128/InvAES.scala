@@ -48,11 +48,11 @@ class InvAES extends Module {
   io.blockOut := state
   io.done     := doneR
 
-  isr.io.state_in := state
-  isb.io.state_in := isr.io.state_out
-  ark.io.state_in := isb.io.state_out
-  ark.io.roundKey := rk(round)
-  imc.io.state_in := ark.io.state_out
+  isr.io.in := state
+  isb.io.in := isr.io.out
+  ark.io.in := isb.io.out
+  ark.io.rKey := rk(round)
+  imc.io.in := ark.io.out
 
   when(io.start && !active) {
     for (i <- 0 until 16) { state(i) := io.blockIn(i) ^ rk(10)(i) }
@@ -61,14 +61,14 @@ class InvAES extends Module {
     doneR  := false.B
   } .elsewhen(active) {
     when(round > 0.U) {
-      state := imc.io.state_out
+      state := imc.io.out
       round := round - 1.U
     } .otherwise {
-      isr.io.state_in := state
-      isb.io.state_in := isr.io.state_out
-      ark.io.state_in := isb.io.state_out
-      ark.io.roundKey := rk(0)
-      state  := ark.io.state_out
+      isr.io.in := state
+      isb.io.in := isr.io.out
+      ark.io.in := isb.io.out
+      ark.io.rKey := rk(0)
+      state  := ark.io.out
       active := false.B
       doneR  := true.B
     }

@@ -5,29 +5,29 @@ import chisel3._
 
 class InvShiftRows extends Module {
   val io = IO(new Bundle {
-    val state_in = Input(Vec(16, UInt(8.W)))
-    val state_out = Output(Vec(16, UInt(8.W)))
+    val in = Input(Vec(16, UInt(8.W)))
+    val out = Output(Vec(16, UInt(8.W)))
   })
 
-  io.state_out(0) := io.state_in(0)
-  io.state_out(1) := io.state_in(13)
-  io.state_out(2) := io.state_in(10)
-  io.state_out(3) := io.state_in(7)
+  io.out(0) := io.in(0)
+  io.out(1) := io.in(13)
+  io.out(2) := io.in(10)
+  io.out(3) := io.in(7)
 
-  io.state_out(4) := io.state_in(4)
-  io.state_out(5) := io.state_in(1)
-  io.state_out(6) := io.state_in(14)
-  io.state_out(7) := io.state_in(11)
+  io.out(4) := io.in(4)
+  io.out(5) := io.in(1)
+  io.out(6) := io.in(14)
+  io.out(7) := io.in(11)
 
-  io.state_out(8) := io.state_in(8)
-  io.state_out(9) := io.state_in(5)
-  io.state_out(10) := io.state_in(2)
-  io.state_out(11) := io.state_in(15)
+  io.out(8) := io.in(8)
+  io.out(9) := io.in(5)
+  io.out(10) := io.in(2)
+  io.out(11) := io.in(15)
 
-  io.state_out(12) := io.state_in(12)
-  io.state_out(13) := io.state_in(9)
-  io.state_out(14) := io.state_in(6)
-  io.state_out(15) := io.state_in(3)
+  io.out(12) := io.in(12)
+  io.out(13) := io.in(9)
+  io.out(14) := io.in(6)
+  io.out(15) := io.in(3)
 }
 
 object InvShiftRows {

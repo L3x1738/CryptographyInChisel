@@ -14,13 +14,13 @@ class AddRoundKeysUnitTest extends AnyFlatSpec with ChiselScalatestTester {
       val exp   = state.zip(key).map{ case (s,k) => (s ^ k) & 0xff }
 
       for (i <- 0 until 16) {
-        dut.io.state_in(i).poke(state(i).U)
-        dut.io.roundKey(i).poke(key(i).U)
+        dut.io.in(i).poke(state(i).U)
+        dut.io.rKey(i).poke(key(i).U)
       }
 
       dut.clock.step()
       for (i <- 0 until 16) {
-        dut.io.state_out(i).expect(exp(i).U)
+        dut.io.out(i).expect(exp(i).U)
       }
     }
   }

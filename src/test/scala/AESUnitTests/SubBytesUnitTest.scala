@@ -12,9 +12,9 @@ class SubBytesUnitTest extends AnyFlatSpec with ChiselScalatestTester {
       val in  = Array(0x00, 0x01, 0x53, 0xff) ++ Array.fill(12)(0x00)
       val exp = Array(0x63, 0x7c, 0xed, 0x16) ++ Array.fill(12)(0x63)
 
-      for (i <- 0 until 16) dut.io.state_in(i).poke(in(i).U)
+      for (i <- 0 until 16) dut.io.in(i).poke(in(i).U)
       dut.clock.step()
-      for (i <- 0 until 16) dut.io.state_out(i).expect(exp(i).U)
+      for (i <- 0 until 16) dut.io.out(i).expect(exp(i).U)
     }
   }
 }

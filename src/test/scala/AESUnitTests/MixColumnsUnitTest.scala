@@ -23,9 +23,9 @@ class MixColumnsUnitTest extends AnyFlatSpec with ChiselScalatestTester {
         zero, zero, zero, zero
       )
 
-      for (i <- 0 until 16) dut.io.state_in(i).poke(in(i).U)
+      for (i <- 0 until 16) dut.io.in(i).poke(in(i).U)
       dut.clock.step()
-      for (i <- 0 until 16) dut.io.state_out(i).expect(exp(i).U)
+      for (i <- 0 until 16) dut.io.out(i).expect(exp(i).U)
     }
   }
 }

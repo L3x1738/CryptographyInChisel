@@ -46,11 +46,11 @@ class AES extends Module {
   io.done     := doneR
   io.blockOut := state
 
-  sb.io.state_in   := state
-  sr.io.state_in   := sb.io.state_out
-  mc.io.state_in   := sr.io.state_out
-  ark.io.state_in  := mc.io.state_out
-  ark.io.roundKey  := rk(round)
+  sb.io.in   := state
+  sr.io.in   := sb.io.out
+  mc.io.in   := sr.io.out
+  ark.io.in  := mc.io.out
+  ark.io.rKey  := rk(round)
 
   when (io.start && !active) {
     for (i <- 0 until 16) { state(i) := io.blockIn(i) ^ rk(0)(i) }
@@ -59,14 +59,14 @@ class AES extends Module {
     doneR  := false.B
   } .elsewhen (active) {
     when (round < 10.U) {
-      state := ark.io.state_out
+      state := ark.io.out
       round := round + 1.U
     } .otherwise {
-      sb.io.state_in  := state
-      sr.io.state_in  := sb.io.state_out
-      ark.io.state_in := sr.io.state_out
-      ark.io.roundKey := rk(10)
-      state  := ark.io.state_out
+      sb.io.in  := state
+      sr.io.in  := sb.io.out
+      ark.io.in := sr.io.out
+      ark.io.rKey := rk(10)
+      state  := ark.io.out
       active := false.B
       doneR  := true.B
     }
@@ -96,18 +96,18 @@ class AES extends Module {
   val ak = Seq.fill(10)(Module(new AddRoundKey()))
 
   for (r <- 1 to 9) {
-    sb(r-1).io.state_in := states(r-1)
-    sr(r-1).io.state_in := sb(r-1).io.state_out
-    mc(r-1).io.state_in := sr(r-1).io.state_out
-    ak(r-1).io.state_in := mc(r-1).io.state_out
+    sb(r-1).io.in := states(r-1)
+    sr(r-1).io.in := sb(r-1).io.out
+    mc(r-1).io.in := sr(r-1).io.out
+    ak(r-1).io.in := mc(r-1).io.out
     ak(r-1).io.roundKey := rk(r)
-    states(r) := ak(r-1).io.state_out
+    states(r) := ak(r-1).io.out
   }
-  sb(9).io.state_in := states(9)
-  sr(9).io.state_in := sb(9).io.state_out
-  ak(9).io.state_in := sr(9).io.state_out
+  sb(9).io.in := states(9)
+  sr(9).io.in := sb(9).io.out
+  ak(9).io.in := sr(9).io.out
   ak(9).io.roundKey := rk(10)
-  states(10) := ak(9).io.state_out
+  states(10) := ak(9).io.out
 
   io.blockOut := states(10)
 }*/

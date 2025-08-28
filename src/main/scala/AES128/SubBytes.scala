@@ -4,8 +4,8 @@ import chisel3._
 //Sbox pentru substituirea fiecarui byte din text
 class SubBytes extends Module {
   val io = IO(new Bundle {
-    val state_in  = Input(Vec(16, UInt(8.W)))
-    val state_out = Output(Vec(16, UInt(8.W)))
+    val in  = Input(Vec(16, UInt(8.W)))
+    val out = Output(Vec(16, UInt(8.W)))
   })
   val s_box = VecInit(Array(
     0x63.U, 0x7c.U, 0x77.U, 0x7b.U, 0xf2.U, 0x6b.U, 0x6f.U, 0xc5.U, 0x30.U, 0x01.U, 0x67.U, 0x2b.U, 0xfe.U, 0xd7.U, 0xab.U, 0x76.U,
@@ -26,7 +26,7 @@ class SubBytes extends Module {
     0x8c.U, 0xa1.U, 0x89.U, 0x0d.U, 0xbf.U, 0xe6.U, 0x42.U, 0x68.U, 0x41.U, 0x99.U, 0x2d.U, 0x0f.U, 0xb0.U, 0x54.U, 0xbb.U, 0x16.U))
 
   for (i <- 0 until 16) {
-    io.state_out(i) := s_box(io.state_in(i))
+    io.out(i) := s_box(io.in(i))
   }
 }
 object SubBytes {

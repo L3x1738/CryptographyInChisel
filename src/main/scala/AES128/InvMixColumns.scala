@@ -14,8 +14,8 @@ import chisel3._
 
 class InvMixColumns extends Module {
   val io = IO(new Bundle {
-    val state_in  = Input(Vec(16, UInt(8.W)))
-    val state_out = Output(Vec(16, UInt(8.W)))
+    val in  = Input(Vec(16, UInt(8.W)))
+    val out = Output(Vec(16, UInt(8.W)))
   })
 
   private def xtime(x: UInt): UInt = {
@@ -30,20 +30,20 @@ class InvMixColumns extends Module {
   private def m13(x: UInt) = (m8(x) ^ m4(x) ^ x)(7,0)
   private def m14(x: UInt) = (m8(x) ^ m4(x) ^ m2(x))(7,0)
 
-  val out = Wire(Vec(16, UInt(8.W)))
+  val temp = Wire(Vec(16, UInt(8.W)))
   for (base <- 0 until 16 by 4) {
-    val a = io.state_in(base + 0)
-    val b = io.state_in(base + 1)
-    val c = io.state_in(base + 2)
-    val d = io.state_in(base + 3)
+    val a = io.in(base + 0)
+    val b = io.in(base + 1)
+    val c = io.in(base + 2)
+    val d = io.in(base + 3)
 
-    out(base + 0) := m14(a) ^ m11(b) ^ m13(c) ^ m9(d)
-    out(base + 1) := m9(a)  ^ m14(b) ^ m11(c) ^ m13(d)
-    out(base + 2) := m13(a) ^ m9(b)  ^ m14(c) ^ m11(d)
-    out(base + 3) := m11(a) ^ m13(b) ^ m9(c)  ^ m14(d)
+    temp(base + 0) := m14(a) ^ m11(b) ^ m13(c) ^ m9(d)
+    temp(base + 1) := m9(a)  ^ m14(b) ^ m11(c) ^ m13(d)
+    temp(base + 2) := m13(a) ^ m9(b)  ^ m14(c) ^ m11(d)
+    temp(base + 3) := m11(a) ^ m13(b) ^ m9(c)  ^ m14(d)
   }
 
-  io.state_out := out
+  io.out := temp
 }
 
 object InvMixColumns {
