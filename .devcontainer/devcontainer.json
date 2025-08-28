@@ -1,0 +1,6 @@
+// If you want to run as a non-root user in the container, see .devcontainer/docker-compose.yml.
+{
+	"name": "Chisel 3.5 Dev",
+	"build": { "dockerfile": "Dockerfile" },
+	"runArgs": [ "--rm"]
+}
