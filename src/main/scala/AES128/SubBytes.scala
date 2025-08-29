@@ -4,7 +4,7 @@ import chisel3._
 //Sbox pentru substituirea fiecarui byte din text
 class SubBytes extends Module {
   val io = IO(new Bundle {
-    val in  = Input(Vec(16, UInt(8.W)))
+    val in = Input(Vec(16, UInt(8.W)))
     val out = Output(Vec(16, UInt(8.W)))
   })
   val s_box = VecInit(Array(

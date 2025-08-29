@@ -5,18 +5,15 @@ import chiseltest._
 import org.scalatest.flatspec.AnyFlatSpec
 
 class Sha256UnitTest extends AnyFlatSpec with ChiselScalatestTester {
-
-  // Funcție pentru a converti string în array de bytes
+  //Functii ajutatoare pentru conversii
   def stringToBytes(input: String): Array[Int] = {
     input.getBytes("UTF-8").map(_.toInt & 0xFF)
   }
 
-  // Funcție pentru a converti hash-ul de la BigInt la string hexazecimal
   def hashToHexString(hashWords: Array[BigInt]): String = {
     hashWords.map(word => f"${word.toLong}%08x").mkString("")
   }
 
-  // Funcție pentru a converti string hexazecimal în array de BigInt (pentru expected values)
   def hexStringToWords(hexString: String): Array[BigInt] = {
     require(hexString.length == 64, "SHA-256 hash trebuie să aibă 64 caractere hex")
     (0 until 8).map { i =>
@@ -26,40 +23,27 @@ class Sha256UnitTest extends AnyFlatSpec with ChiselScalatestTester {
     }.toArray
   }
 
-  // Funcție principală pentru testarea SHA-256
   def testSha256(input: String, expectedHashHex: String): Unit = {
     test(new Sha256) { dut =>
       val inputBytes = stringToBytes(input)
       val expectedWords = hexStringToWords(expectedHashHex)
 
-      // Curăță toate byte-urile mesajului
       for (i <- 0 until 64) dut.io.msg(i).poke(0.U)
-
-      // Setează byte-urile de intrare
       for (i <- inputBytes.indices) {
         dut.io.msg(i).poke(inputBytes(i).U)
       }
-
-      // Setează lungimea mesajului în biți
       dut.io.length.poke((inputBytes.length * 8).U)
-
-      // Așteaptă să fie ready
       while (!dut.io.ready.peek().litToBoolean) {
         dut.clock.step()
       }
-
-      // Start calculul
       dut.io.start.poke(true.B)
       dut.clock.step()
       dut.io.start.poke(false.B)
-
-      // Așteaptă rezultatul (cu guard pentru timeout)
       var cycles = 0
       while (!dut.io.valid.peek().litToBoolean && cycles < 300) {
         dut.clock.step()
         cycles += 1
       }
-
 
       for (i <- 0 until 8) {
         dut.io.hash(i).expect(expectedWords(i).U(32.W))

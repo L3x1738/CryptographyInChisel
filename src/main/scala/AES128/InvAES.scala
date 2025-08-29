@@ -4,10 +4,10 @@ import chisel3._
 
 class InvAES extends Module {
   val io = IO(new Bundle {
-    val blockIn  = Input(Vec(16, UInt(8.W)))
+    val blockIn = Input(Vec(16, UInt(8.W)))
     val blockOut = Output(Vec(16, UInt(8.W)))
-    val start    = Input(Bool())
-    val done     = Output(Bool())
+    val start = Input(Bool())
+    val done = Output(Bool())
   })
 
   val rk = VecInit(Seq(

@@ -4,10 +4,10 @@ import chisel3._
 
 class AES extends Module {
   val io = IO(new Bundle {
-    val blockIn  = Input(Vec(16, UInt(8.W)))
+    val blockIn = Input(Vec(16, UInt(8.W)))
     val blockOut = Output(Vec(16, UInt(8.W)))
-    val start    = Input(Bool())
-    val done     = Output(Bool())
+    val start = Input(Bool())
+    val done = Output(Bool())
   })
 
   val rk = VecInit(Seq(
@@ -34,23 +34,23 @@ class AES extends Module {
     VecInit(Seq(0x13,0x11,0x1d,0x7f, 0xe3,0x94,0x4a,0x17,
       0xf3,0x07,0xa7,0x8b, 0x4d,0x2b,0x30,0xc5).map(_.U(8.W)))
   ))
-  val sb  = Module(new SubBytes())
-  val sr  = Module(new ShiftRows())
-  val mc  = Module(new MixColumns())
+  val sb = Module(new SubBytes())
+  val sr = Module(new ShiftRows())
+  val mc = Module(new MixColumns())
   val ark = Module(new AddRoundKey())
 
-  val state  = Reg(Vec(16, UInt(8.W)))
-  val round  = RegInit(0.U(4.W))
+  val state = Reg(Vec(16, UInt(8.W)))
+  val round = RegInit(0.U(4.W))
   val active = RegInit(false.B)
-  val doneR  = RegInit(false.B)
-  io.done     := doneR
+  val doneR = RegInit(false.B)
+  io.done := doneR
   io.blockOut := state
 
-  sb.io.in   := state
-  sr.io.in   := sb.io.out
-  mc.io.in   := sr.io.out
-  ark.io.in  := mc.io.out
-  ark.io.rKey  := rk(round)
+  sb.io.in := state
+  sr.io.in := sb.io.out
+  mc.io.in := sr.io.out
+  ark.io.in := mc.io.out
+  ark.io.rKey := rk(round)
 
   when (io.start && !active) {
     for (i <- 0 until 16) { state(i) := io.blockIn(i) ^ rk(0)(i) }
