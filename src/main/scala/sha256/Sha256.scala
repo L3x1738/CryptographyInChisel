@@ -37,10 +37,10 @@ class Sha256 extends Module {
 
   @inline private def rotr(x: UInt, n: Int): UInt = Cat(x(n-1,0), x(31,n))
   @inline private def add32(a: UInt, b: UInt): UInt = (a +& b)(31,0)
-  @inline private def bigSigma0(x: UInt): UInt = rotr(x,2) ^ rotr(x,13) ^ rotr(x,22)
-  @inline private def bigSigma1(x: UInt): UInt = rotr(x,6) ^ rotr(x,11) ^ rotr(x,25)
-  @inline private def smallSigma0(x: UInt): UInt = rotr(x,7) ^ rotr(x,18) ^ ((x >> 3).asUInt.pad(32))
-  @inline private def smallSigma1(x: UInt): UInt = rotr(x,17) ^ rotr(x,19) ^ ((x >> 10).asUInt.pad(32))
+  @inline private def Sigma0(x: UInt): UInt = rotr(x,2) ^ rotr(x,13) ^ rotr(x,22)
+  @inline private def Sigma1(x: UInt): UInt = rotr(x,6) ^ rotr(x,11) ^ rotr(x,25)
+  @inline private def sigma0(x: UInt): UInt = rotr(x,7) ^ rotr(x,18) ^ ((x >> 3).asUInt.pad(32))
+  @inline private def sigma1(x: UInt): UInt = rotr(x,17) ^ rotr(x,19) ^ ((x >> 10).asUInt.pad(32))
   @inline private def ch(x: UInt, y: UInt, z: UInt): UInt = (x & y) ^ ((~x).asUInt & z)
   @inline private def maj(x: UInt, y: UInt, z: UInt): UInt = (x & y) ^ (x & z) ^ (y & z)
 
@@ -99,14 +99,14 @@ class Sha256 extends Module {
         state := expandW
       }
     }
-    // generam restul din W [16....63] conform algoritmului
+
     is (expandW) {
       when (t < 64.U) {
         val w_t2  = W(t - 2.U)
         val w_t7  = W(t - 7.U)
         val w_t15 = W(t - 15.U)
         val w_t16 = W(t - 16.U)
-        W(t) := add32(add32(smallSigma1(w_t2), w_t7), add32(smallSigma0(w_t15), w_t16))
+        W(t) := add32(add32(sigma1(w_t2), w_t7), add32(sigma0(w_t15), w_t16))
         t := t + 1.U
       } .otherwise {
         a := H(0); b := H(1); c := H(2); d := H(3)
@@ -115,11 +115,11 @@ class Sha256 extends Module {
         state := hash
       }
     }
-    //
+
     is (hash) {
       when (t < 64.U) {
-        val T1 = add32(add32(add32(h, bigSigma1(e)), ch(e,f,g)), add32(K(t), W(t)))
-        val T2 = add32(bigSigma0(a), maj(a,b,c))
+        val T1 = add32(add32(add32(h, Sigma1(e)), ch(e,f,g)), add32(K(t), W(t)))
+        val T2 = add32(Sigma0(a), maj(a,b,c))
         h := g; g := f; f := e; e := add32(d, T1)
         d := c; c := b; b := a; a := add32(T1, T2)
         t := t + 1.U

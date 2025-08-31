@@ -25,7 +25,7 @@ class AESCMAC extends Module {
   private def xor(a: Vec[UInt], b: Vec[UInt]) =
     VecInit((0 until 16).map(i => a(i) ^ b(i)))
 
-  private def padBlock(src: Vec[UInt], len: UInt) = {
+  private def padding(src: Vec[UInt], len: UInt) = {
     val out = Wire(Vec(16, UInt(8.W)))
     for (i <- 0 until 16) out(i) := 0.U
     for (i <- 0 until 16) { when (len > i.U) { out(i) := src(i) } }
@@ -36,14 +36,10 @@ class AESCMAC extends Module {
   val X = RegInit(VecInit(Seq.fill(16)(0.U(8.W))))
   val macR = Reg(Vec(16, UInt(8.W)))
   io.mac := macR
-
   val isLastR = RegInit(false.B)
-
-
   val blkDoneR = RegInit(false.B)
   io.blkDone := blkDoneR
   when (blkDoneR) { blkDoneR := false.B }
-
   val macValR = RegInit(false.B)
   io.macValid := macValR
   when (macValR) { macValR := false.B }
@@ -60,7 +56,7 @@ class AESCMAC extends Module {
           inBlk := xor(X, io.blockIn)
         } .otherwise {
           val full = (io.lastBytes === 16.U)
-          val Mi = Mux(full, io.blockIn, padBlock(io.blockIn, io.lastBytes))
+          val Mi = Mux(full, io.blockIn, padding(io.blockIn, io.lastBytes))
           val Mlast = xor(Mi, Mux(full, K1, K2))
           inBlk := xor(X, Mlast)
         }

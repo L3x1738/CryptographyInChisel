@@ -1,5 +1,4 @@
 package AES128
-
 import chisel3._
 
 // [[0,4,8,12],                   [[0,4,8,12],
