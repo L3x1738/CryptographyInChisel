@@ -1,101 +1,49 @@
-Chisel Project Template
+Cryptography in Chisel
 =======================
 
-You've done the [Chisel Bootcamp](https://github.com/freechipsproject/chisel-bootcamp), and now you
-are ready to start your own Chisel project.  The following procedure should get you started
-with a clean running [Chisel3](https://www.chisel-lang.org/) project.
+Acest proiect are ca scop implementarea în Chisel a unor funcții criptografice fundamentale (AES-128, AES-CTR, AES-CMAC și SHA-256). Modulele sunt gândite ca implementări hardware, respectând specificațiile standardelor oficiale, și pot fi utilizate atât pentru înțelegerea arhitecturii algoritmilor criptografici, cât și ca blocuri de bază în sisteme de securitate hardware.
 
-## Make your own Chisel3 project
+## Functii
 
-### Dependencies
+### AES
+Am implementat varianta pe 128 de biți a algoritmului AES (Advanced Encryption Standard), cu suport pentru criptare și decriptare, conform specificației
+https://nvlpubs.nist.gov/nistpubs/fips/nist.fips.197.pdf.
+* Dimensiune bloc: 128 biți (16 bytes)
+* Operații implementate: SubBytes, ShiftRows, MixColumns, AddRoundKey, precum și inversele acestora pentru decriptare
+* Număr de runde: 10 (conform standardului AES-128)
 
-#### JDK 8 or newer
+### AES-CMAC
+Acest modul implementează CMAC (Cipher-based Message Authentication Code) conform https://www.rfc-editor.org/rfc/rfc4493.html#section-2.3
+, utilizând nucleul AES-128 realizat anterior.
 
-We recommend LTS releases Java 8 and Java 11. You can install the JDK as recommended by your operating system, or use the prebuilt binaries from [AdoptOpenJDK](https://adoptopenjdk.net/).
+* Dimensiune bloc: 128 biți (16 bytes)
+* Chei derivate: cele 2 chei K1 si K2 au fost generate cu ajutorul algoritmului din sursa, pe baza cheii AES inițiale.
+* Lungime variabilă a mesajului: suportă mesaje de orice dimensiune, ultimului bloc se aplica padding daca este imcomplet
+*Rezultat: un cod de autentificare (MAC) de 128 biți.
 
-#### SBT or mill
+### AES-CTR (Counter Mode)
+Acest modul implementează AES în modul CTR (Counter Mode), folosind nucleul AES-128 realizat anterior.
+* Dimensiune bloc: 128 biți (16 bytes)
+* IV: 128 biți împărțiți în nonce (12 bytes) și counter (4 bytes, big-endian).
 
-SBT is the most common built tool in the Scala community. You can download it [here](https://www.scala-sbt.org/download.html).  
-mill is another Scala/Java build tool without obscure DSL like SBT. You can download it [here](https://github.com/com-lihaoyi/mill/releases)
+#### Funcționare
 
-### How to get started
+* La fiecare bloc, AES este rulat pe IV curent pentru a genera keystream-ul.
+* Blocul de date (blockIn) este XOR-at cu keystream-ul pentru a produce outBlock.
+* Counter-ul este incrementat automat în IV.
+* Ultimul bloc poate fi mai scurt de 16 bytes – doar primii lastBytes octeți sunt utilizați.
 
-#### Create a repository from the template
+### SHA256
 
-This repository is a Github template. You can create your own repository from it by clicking the green `Use this template` in the top right.
-Please leave `Include all branches` **unchecked**; checking it will pollute the history of your new repository.
-For more information, see ["Creating a repository from a template"](https://docs.github.com/en/free-pro-team@latest/github/creating-cloning-and-archiving-repositories/creating-a-repository-from-a-template).
+Am implementat algoritmul SHA-256 conform specificației [FIPS 180-4](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf)
+.
+* Dimensiune bloc: 512 biți (64 bytes)
+* Dimensiune digest: 256 biți (8 × 32-bit words)
+* Padding standard SHA-256 (0x80 … length).
 
-#### Wait for the template cleanup workflow to complete
+## Site-uri folosite pentru a verifica corectitudinea
 
-After using the template to create your own blank project, please wait a minute or two for the `Template cleanup` workflow to run which will removes some template-specific stuff from the repository (like the LICENSE).
-Refresh the repository page in your browser until you see a 2nd commit by `actions-user` titled `Template cleanup`.
-
-
-#### Clone your repository
-
-Once you have created a repository from this template and the `Template cleanup` workflow has completed, you can click the green button to get a link for cloning your repository.
-Note that it is easiest to push to a repository if you set up SSH with Github, please see the [related documentation](https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/connecting-to-github-with-ssh). SSH is required for pushing to a Github repository when using two-factor authentication.
-
-```sh
-git clone git@github.com:%REPOSITORY%.git
-cd %NAME%
-```
-(The variables wrapped in `%` will be filled in by the template cleanup) <!-- #REMOVE-ON-CLEANUP# -->
-
-#### Set project organization and name in build.sbt
-
-The cleanup workflow will have attempted to provide sensible defaults for `ThisBuild / organization` and `name` in the `build.sbt`.
-Feel free to use your text editor of choice to change them as you see fit.
-
-#### Clean up the README.md file
-
-Again, use you editor of choice to make the README specific to your project.
-
-#### Add a LICENSE file
-
-It is important to have a LICENSE for open source (or closed source) code.
-This template repository has the Unlicense in order to allow users to add any license they want to derivative code.
-The Unlicense is stripped when creating a repository from this template so that users do not accidentally unlicense their own work.
-
-For more information about a license, check out the [Github Docs](https://docs.github.com/en/free-pro-team@latest/github/building-a-strong-community/adding-a-license-to-a-repository).
-
-#### Commit your changes
-```sh
-git commit -m 'Starting %NAME%'
-git push origin main
-```
-
-### Did it work?
-
-You should now have a working Chisel3 project.
-
-You can run the included test with:
-```sh
-sbt test
-```
-
-You should see a whole bunch of output that ends with something like the following lines
-```
-[info] Tests: succeeded 1, failed 0, canceled 0, ignored 0, pending 0
-[info] All tests passed.
-[success] Total time: 5 s, completed Dec 16, 2020 12:18:44 PM
-```
-If you see the above then...
-
-### It worked!
-
-You are ready to go. We have a few recommended practices and things to do.
-
-* Use packages and following conventions for [structure](https://www.scala-sbt.org/1.x/docs/Directories.html) and [naming](http://docs.scala-lang.org/style/naming-conventions.html)
-* Package names should be clearly reflected in the testing hierarchy
-* Build tests for all your work
-* Read more about testing in SBT in the [SBT docs](https://www.scala-sbt.org/1.x/docs/Testing.html)
-* This template includes a [test dependency](https://www.scala-sbt.org/1.x/docs/Library-Dependencies.html#Per-configuration+dependencies) on [chiseltest](https://github.com/ucb-bar/chisel-testers2), this is a reasonable starting point for most tests
-  * You can remove this dependency in the build.sbt file if you want to
-* Change the name of your project in the build.sbt file
-* Change your README.md
-
-## Problems? Questions?
-
-Check out the [Chisel Users Community](https://www.chisel-lang.org/community.html) page for links to get in contact!
+* AES - https://testprotect.com/appendix/AEScalc
+* AES-CMAC - https://www.lddgo.net/en/encrypt/cmac-calculate
+* AES-CTR - https://cryptii.com/pipes/aes-encryption
+* SHA256 - https://emn178.github.io/online-tools/sha256.html
