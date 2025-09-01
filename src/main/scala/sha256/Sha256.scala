@@ -49,13 +49,13 @@ class Sha256 extends Module {
 
   private val W = Reg(Vec(64, UInt(32.W)))
   private val H = Reg(Vec(8, UInt(32.W)))
-  private val a = Reg(UInt(32.W));
+  private val a = Reg(UInt(32.W))
   private val b = Reg(UInt(32.W))
-  private val c = Reg(UInt(32.W));
+  private val c = Reg(UInt(32.W))
   private val d = Reg(UInt(32.W))
-  private val e = Reg(UInt(32.W));
+  private val e = Reg(UInt(32.W))
   private val f = Reg(UInt(32.W))
-  private val g = Reg(UInt(32.W));
+  private val g = Reg(UInt(32.W))
   private val h = Reg(UInt(32.W))
   private val t = Reg(UInt(7.W))
 

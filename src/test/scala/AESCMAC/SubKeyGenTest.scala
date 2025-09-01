@@ -4,7 +4,7 @@ import chiseltest._
 import org.scalatest.flatspec.AnyFlatSpec
 
 class SubKeyGenTest extends AnyFlatSpec with ChiselScalatestTester {
-  "SubKeyGenConst" should "print L, K1, K2" in {
+  "SubKeyGen" should "print L, K1, K2" in {
     test(new SubKeyGen()) { dut =>
       dut.reset.poke(true.B); dut.clock.step(2); dut.reset.poke(false.B)
       dut.io.start.poke(true.B); dut.clock.step(1); dut.io.start.poke(false.B)

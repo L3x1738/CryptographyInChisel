@@ -7,7 +7,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import scala.collection.mutable.ArrayBuffer
 
 class AESCTRUnitTest extends AnyFlatSpec with ChiselScalatestTester {
-  behavior of "AESctr (simplu, orice lungime)"
+  behavior of "AESctr"
 
   it should "match expected ciphertext" in {
     test(new AESctr) { dut =>
@@ -34,7 +34,7 @@ class AESCTRUnitTest extends AnyFlatSpec with ChiselScalatestTester {
         }
         dut.io.isLast.poke(((i + blkLen) == pt.length).B)
         dut.io.lastBytes.poke(blkLen.U)
-        dut.io.go.poke(true.B); dut.clock.step(); dut.io.go.poke(false.B)
+        dut.io.start.poke(true.B); dut.clock.step(); dut.io.start.poke(false.B)
         while (!dut.io.outValid.peek().litToBoolean) { dut.clock.step() }
         var k = 0
         while (k < blkLen) {

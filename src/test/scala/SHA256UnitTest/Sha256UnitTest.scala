@@ -15,7 +15,6 @@ class Sha256UnitTest extends AnyFlatSpec with ChiselScalatestTester {
   }
 
   def hexStringToWords(hexString: String): Array[BigInt] = {
-    require(hexString.length == 64, "SHA-256 hash trebuie să aibă 64 caractere hex")
     (0 until 8).map { i =>
       val start = i * 8
       val end = start + 8
@@ -51,9 +50,8 @@ class Sha256UnitTest extends AnyFlatSpec with ChiselScalatestTester {
     }
   }
 
-  behavior of "SHA-256 (single-block, start/valid)"
-
-  it should "match FIPS 180-4 vector for \"abc\"" in {
+  behavior of "SHA-256"
+  it should "match hash value of input with the expected hash" in {
     testSha256(
       input = "abc",
       expectedHashHex = "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"

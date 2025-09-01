@@ -4,8 +4,7 @@ import chiseltest._
 import org.scalatest.flatspec.AnyFlatSpec
 
 class InvAESUnitTest extends AnyFlatSpec with ChiselScalatestTester {
-  behavior of "AES-128 Decrypt (iterativ, start/done)"
-
+  behavior of "AES-128 Decryption"
   it should "decrypt NIST FIPS-197 vector" in {
     test(new InvAES()) { dut =>
       val pt = Array(0x00,0x11,0x22,0x33, 0x44,0x55,0x66,0x77, 0x88,0x99,0xaa,0xbb, 0xcc,0xdd,0xee,0xff)

@@ -4,7 +4,7 @@ import chisel3.util._
 
 class AESCMAC extends Module {
   val io = IO(new Bundle {
-    val go = Input(Bool())
+    val start = Input(Bool())
     val blockIn = Input(Vec(16, UInt(8.W)))
     val isLast = Input(Bool())
     val lastBytes = Input(UInt(5.W))
@@ -13,8 +13,7 @@ class AESCMAC extends Module {
     val macValid = Output(Bool())
   })
 
-  private def bytes(hex: String): Vec[UInt] =
-    VecInit(hex.grouped(2).toArray.map(h => BigInt(h,16).U(8.W)))
+  private def bytes(hex: String): Vec[UInt] = VecInit(hex.grouped(2).toArray.map(h => BigInt(h,16).U(8.W)))
   val K1 = bytes("8d42766f0f1eb704de9f02c54391b075")
   val K2 = bytes("1a84ecde1e3d6e09bd3e058a8723606d")
 
@@ -22,8 +21,7 @@ class AESCMAC extends Module {
   aes.io.start := false.B
   aes.io.blockIn := VecInit(Seq.fill(16)(0.U(8.W)))
 
-  private def xor(a: Vec[UInt], b: Vec[UInt]) =
-    VecInit((0 until 16).map(i => a(i) ^ b(i)))
+  private def xor(a: Vec[UInt], b: Vec[UInt]) = VecInit((0 until 16).map(i => a(i) ^ b(i)))
 
   private def padding(src: Vec[UInt], len: UInt) = {
     val out = Wire(Vec(16, UInt(8.W)))
@@ -49,7 +47,7 @@ class AESCMAC extends Module {
 
   switch (st) {
     is (idle) {
-      when (io.go) {
+      when (io.start) {
         isLastR := io.isLast
         val inBlk = Wire(Vec(16, UInt(8.W)))
         when (!io.isLast) {

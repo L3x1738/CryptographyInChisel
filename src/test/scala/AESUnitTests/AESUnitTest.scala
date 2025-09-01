@@ -5,8 +5,7 @@ import chiseltest._
 import org.scalatest.flatspec.AnyFlatSpec
 
 class AESUnitTest extends AnyFlatSpec with ChiselScalatestTester {
-  behavior of "AES"
-
+  behavior of "AES Encryption"
   it should "match NIST FIPS-197 AES-128 vector" in {
     test(new AES()) { dut =>
       //val pt = Array(0x00,0x11,0x22,0x33, 0x44,0x55,0x66,0x77, 0x88,0x99,0xaa,0xbb, 0xcc,0xdd,0xee,0xff)
